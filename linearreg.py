@@ -31,20 +31,45 @@ def trainlinearregression ( X, y, lda):
     print (str(m) + " " + str(n) )
     initial_theta = np.zeros((n, 1))
     result = op.minimize(fun = costfunction, x0 = initial_theta, args = (X, y, lda), method = 'TNC',
-             jac = gradient, options ={ 'disp': False, 'maxiter': 200 }  )
+             jac = gradient, options ={ 'disp': True, 'maxiter': 200 }  )
     optimal_theta = result.x
     return optimal_theta
 
+def cost(theta, X, y):
+    m,n = X.shape
+    theta = theta.reshape((n, 1))
+    y = y.reshape((m, 1))
+    error = np.dot(X, theta) - y
+    sqe = sum(np.square(error))
+    return error,sqe
+
+
 def main():
-    X = np.array([[1,1,2,3],[1,4,5,6], [1,7,8,9]])
-    y = np.array([21,48,75]).reshape((3,1))
-    # theta = np.array([1,2,3,4])
-    lda = 0.001
-    # J = costfunction(X, y, theta, lda)
-    # G = gradient(X, y, theta, lda)
-    t = trainlinearregression( X, y, lda)
+
+    lda = 0.01
+    Xtemp = np.loadtxt('house_train.csv', dtype = float, delimiter = ',', usecols = range(11) )
+    mtr,ntr = np.shape(Xtemp)
+    Xtrain = np.hstack ((np.ones ((mtr, 1)), Xtemp))
+    Ytrain = np.loadtxt('house_train.csv', dtype = float, delimiter = ',', usecols = (11,) )
+
+    Xtemp = np.loadtxt('house_cv.csv', dtype = float, delimiter = ',', usecols = range(11) )
+    mcv,ncv = np.shape(Xtemp)
+    Xcv = np.hstack ((np.ones ((mcv, 1)), Xtemp))
+    Ycv = np.loadtxt('house_cv.csv', dtype = float, delimiter = ',', usecols = (11,) )
+
+    Xtemp = np.loadtxt('house_test.csv', dtype = float, delimiter = ',', usecols = range(11) )
+    mtst,ntst = np.shape(Xtemp)
+    Xtest = np.hstack ((np.ones ((mtst, 1)), Xtemp))
+    Ytest = np.loadtxt('house_test.csv', dtype = float, delimiter = ',', usecols = (11,) )
+
+    # print(Xtrain)
+    t = trainlinearregression( Xtrain, Ytrain, lda)
     print(t)
-    # print(G)
+    errtr, sqetr = cost(t, Xtrain, Ytrain)
+    #print(errtr)
+
+    errcv, sqecv = cost(t, Xcv, Ycv)
+    print(errcv)
 
 
 if __name__ == '__main__' :
