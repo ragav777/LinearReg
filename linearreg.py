@@ -1,4 +1,3 @@
-__author__ = 'ragav777'
 import numpy as np
 import scipy.optimize as op
 import csv
